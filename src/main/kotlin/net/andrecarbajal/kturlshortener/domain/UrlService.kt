@@ -98,10 +98,10 @@ class UrlService(private val urlRepository: UrlRepository) {
 
         try {
             val urlObj: URL = URI(url).toURL()
-            val protocol: String = urlObj.protocol
-            val host: String = urlObj.host
+            val protocol: String? = urlObj.protocol
+            val host: String? = urlObj.host
 
-            if (protocol == null || host == null || host.isEmpty()) {
+            if (protocol == null || host.isNullOrEmpty()) {
                 return true
             }
 
