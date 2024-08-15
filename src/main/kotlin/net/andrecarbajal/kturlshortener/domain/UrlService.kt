@@ -1,6 +1,6 @@
-package net.andrecarbajal.domain
+package net.andrecarbajal.kturlshortener.domain
 
-import net.andrecarbajal.infra.UrlException
+import net.andrecarbajal.kturlshortener.infra.UrlException
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import java.net.MalformedURLException

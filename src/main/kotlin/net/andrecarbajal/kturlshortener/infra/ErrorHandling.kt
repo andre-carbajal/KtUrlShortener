@@ -1,4 +1,4 @@
-package net.andrecarbajal.infra
+package net.andrecarbajal.kturlshortener.infra
 
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity

@@ -1,7 +1,7 @@
-package net.andrecarbajal.controller
+package net.andrecarbajal.kturlshortener.controller
 
 import jakarta.transaction.Transactional
-import net.andrecarbajal.domain.UrlService
+import net.andrecarbajal.kturlshortener.domain.UrlService
 import org.springframework.stereotype.Controller
 import org.springframework.ui.Model
 import org.springframework.web.bind.annotation.GetMapping

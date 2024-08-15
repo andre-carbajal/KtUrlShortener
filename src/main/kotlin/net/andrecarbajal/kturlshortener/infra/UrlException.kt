@@ -1,4 +1,4 @@
-package net.andrecarbajal.infra
+package net.andrecarbajal.kturlshortener.infra
 
 sealed class UrlException(message: String) : RuntimeException(message) {
     class ValidationException(message: String) : UrlException(message)

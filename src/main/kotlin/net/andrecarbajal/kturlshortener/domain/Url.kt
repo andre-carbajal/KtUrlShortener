@@ -1,4 +1,4 @@
-package net.andrecarbajal.domain
+package net.andrecarbajal.kturlshortener.domain
 
 import jakarta.persistence.*
 import lombok.AllArgsConstructor
