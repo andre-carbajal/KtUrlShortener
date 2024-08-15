@@ -20,4 +20,10 @@ class ErrorHandling {
     fun handleAuthException(e: UrlException.AuthException): ResponseEntity<String> {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.message)
     }
+
+    @ExceptionHandler(UrlException.NotFoundException::class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    fun handleNotFoundException(e: UrlException.NotFoundException): ResponseEntity<String> {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.message)
+    }
 }

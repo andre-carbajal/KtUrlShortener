@@ -47,6 +47,13 @@ class UrlService(private val urlRepository: UrlRepository) {
         return baseUrl + code
     }
 
+    fun getOriginalUrl(urlCode: String): String {
+        val url: Url = urlRepository.findByUrlCode(urlCode)
+            ?: throw UrlException.NotFoundException("URL not found")
+
+        return url.originalUrl
+    }
+
     private fun isNotValidUrl(url: String): Boolean {
         val urlRegex = "^(https?|ftp)://([a-zA-Z0-9.-]+)(:[0-9]+)?(/.*)?$"
         val urlPattern: Pattern = Pattern.compile(urlRegex)
