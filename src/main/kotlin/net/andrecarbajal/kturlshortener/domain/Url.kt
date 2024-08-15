@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor
 data class Url(
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY) var id: Long? = null,
 
-    @JoinColumn(name = "original_url") var originalUrl: String,
+    @JoinColumn(name = "original_url") var originalUrl: String?,
 
-    @JoinColumn(name = "url_code") val urlCode: String
+    @JoinColumn(name = "url_code") var urlCode: String?
 )

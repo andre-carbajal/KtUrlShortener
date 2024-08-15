@@ -2,6 +2,7 @@ package net.andrecarbajal.kturlshortener.domain
 
 import net.andrecarbajal.kturlshortener.infra.UrlException
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
 import java.net.MalformedURLException
 import java.net.URI
@@ -47,11 +48,44 @@ class UrlService(private val urlRepository: UrlRepository) {
         return baseUrl + code
     }
 
-    fun getOriginalUrl(urlCode: String): String {
+    fun getOriginalUrl(urlCode: String): String? {
         val url: Url = urlRepository.findByUrlCode(urlCode)
             ?: throw UrlException.NotFoundException("URL not found")
 
         return url.originalUrl
+    }
+
+    fun updateUrlCode(auth: String, id: Long, data: Url): ResponseEntity<Void> {
+        if (authCode != auth) {
+            throw  UrlException.AuthException("Invalid auth code")
+        }
+
+        val url = urlRepository.findById(id).orElseThrow{UrlException.NotFoundException("URL not found")}
+
+        if (data.originalUrl!!.isNotEmpty() && isNotValidUrl(data.originalUrl!!)) {
+            return ResponseEntity.badRequest().build()
+        }
+
+        if (data.originalUrl!!.isNotEmpty()) {
+            url.originalUrl = data.originalUrl
+        }
+
+        if (data.urlCode!!.isNotEmpty()) {
+            url.urlCode = data.urlCode
+        }
+
+        urlRepository.save(url)
+        return ResponseEntity.ok().build()
+    }
+
+    fun deleteUrl(auth: String, id: Long): ResponseEntity<Void> {
+        if (authCode != auth) {
+            throw UrlException.AuthException("Invalid auth code")
+        }
+
+        val url = urlRepository.findById(id).orElseThrow{UrlException.NotFoundException("URL not found")}
+        urlRepository.delete(url)
+        return ResponseEntity.ok().build()
     }
 
     private fun isNotValidUrl(url: String): Boolean {
