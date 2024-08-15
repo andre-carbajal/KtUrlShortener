@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <title>URL Shortener</title>
+</head>
+<body class="flex items-center justify-center min-h-screen bg-gray-100">
+<div class="text-center">
+    <h1 class="text-3xl font-bold mb-4">URL Shortener</h1>
+    <form action="/ui/urls" method="post" class="mb-4">
+        <label class="block mb-2">Create a short url:</label>
+        <input placeholder='Shorten your link' type="text" id="originalUrl" name="originalUrl" required
+               class="border p-2 mb-4 w-full">
+        <div class="flex mb-4">
+            <input placeholder="Code (optional)" type="text" id="urlCode" name="urlCode" class="border p-2 w-1/2 mr-2">
+            <input placeholder='Auth' type="password" id="authInput" name="authInput" class="border p-2 w-1/2">
+        </div>
+        <button type="submit" class="bg-purple-700 hover:bg-purple-600 text-white p-2 rounded w-full">Shorten</button>
+        <div th:if="${errorMessage}" class="text-red-500 mt-2" th:text="${errorMessage}"></div>
+    </form>
+    <div>
+        <h2 class="text-2xl font-semibold mb-4">URLs</h2>
+        <ul>
+            <li th:each="url : ${urls}" class="px-4 py-2 cursor-pointer"
+                th:text="${baseUrl} + '/' + ${url.urlCode}"
+                onclick="redirectToUrl(this)"></li>
+        </ul>
+    </div>
+</div>
+<script>
+    function redirectToUrl(element) {
+        const url = element.textContent;
+        window.open(url, '_blank');
+    }
+</script>
+</body>
+</html>
