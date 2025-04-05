@@ -9,6 +9,7 @@ import java.net.URI
 import java.net.URISyntaxException
 import java.net.URL
 import java.security.SecureRandom
+import java.time.LocalDateTime
 import java.util.regex.Pattern
 
 @Service
@@ -20,14 +21,11 @@ class UrlService(private val urlRepository: UrlRepository) {
     @Value("\${app.auth}")
     lateinit var authCode: String
 
-    fun getAllUrls(): List<Url> {
-        return urlRepository.findAll().reversed()
-    }
-
-    fun shortenUrl(originalUrl: String, urlCode: String, authInput: String): String {
+    fun shortenUrl(originalUrl: String, codeInput: String, authInput: String): String {
         if (authCode != authInput) {
             throw UrlException.AuthException("Invalid auth code")
         }
+
         if (isNotValidUrl(originalUrl)) {
             throw UrlException.ValidationException("Invalid URL format")
         }
@@ -37,8 +35,8 @@ class UrlService(private val urlRepository: UrlRepository) {
             return baseUrl + existingUrls.first().urlCode
         }
 
-        var code = urlCode
-        if (urlCode.isEmpty()) {
+        var code = codeInput
+        if (codeInput.isEmpty()) {
             code = generateCode()
         }
 
@@ -48,43 +46,47 @@ class UrlService(private val urlRepository: UrlRepository) {
         return baseUrl + code
     }
 
-    fun getOriginalUrl(urlCode: String): String? {
-        val url: Url = urlRepository.findByUrlCode(urlCode)
-            ?: throw UrlException.NotFoundException("URL not found")
+    fun getOriginalUrl(shortUrl: String): String? {
+        val url: Url = urlRepository.findByUrlCode(shortUrl)
+            ?: return null
 
+        url.incrementVisits()
+        urlRepository.save(url)
         return url.originalUrl
     }
 
-    fun updateUrlCode(auth: String, id: Long, data: Url): ResponseEntity<Void> {
-        if (authCode != auth) {
-            throw  UrlException.AuthException("Invalid auth code")
-        }
-
-        val url = urlRepository.findById(id).orElseThrow{UrlException.NotFoundException("URL not found")}
-
-        if (data.originalUrl!!.isNotEmpty() && isNotValidUrl(data.originalUrl!!)) {
-            return ResponseEntity.badRequest().build()
-        }
-
-        if (data.originalUrl!!.isNotEmpty()) {
-            url.originalUrl = data.originalUrl
-        }
-
-        if (data.urlCode!!.isNotEmpty()) {
-            url.urlCode = data.urlCode
-        }
-
-        urlRepository.save(url)
-        return ResponseEntity.ok().build()
+    fun getUrlStats(urlCode: String): Url? {
+        return urlRepository.findByUrlCode(urlCode)
     }
 
-    fun deleteUrl(auth: String, id: Long): ResponseEntity<Void> {
-        if (authCode != auth) {
+    fun getAllUrls(): List<Url> {
+        return urlRepository.findAll().reversed()
+    }
+
+    fun deleteUrl(authInput: String, urlCode: String): ResponseEntity<Void> {
+        if (authCode != authInput) {
             throw UrlException.AuthException("Invalid auth code")
         }
 
-        val url = urlRepository.findById(id).orElseThrow{UrlException.NotFoundException("URL not found")}
+        val url: Url = urlRepository.findByUrlCode(urlCode)
+            ?: return ResponseEntity.notFound().build()
+
         urlRepository.delete(url)
+        return ResponseEntity.noContent().build()
+    }
+
+    fun updateUrlCode(authInput: String, urlCode: String, data: Url): ResponseEntity<Void> {
+        if (authCode != authInput) {
+            throw UrlException.AuthException("Invalid auth code")
+        }
+
+        val url: Url = urlRepository.findByUrlCode(urlCode)
+            ?: return ResponseEntity.notFound().build()
+
+        url.originalUrl = data.originalUrl
+        url.updatedAt = LocalDateTime.now()
+
+        urlRepository.save(url)
         return ResponseEntity.ok().build()
     }
 

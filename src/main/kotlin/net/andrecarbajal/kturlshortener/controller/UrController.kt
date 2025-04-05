@@ -16,16 +16,26 @@ class UrController(private val urlService: UrlService) {
         return ResponseEntity.ok(urlService.getAllUrls())
     }
 
-    @PutMapping("/api/urls/{id}")
-    @Transactional
-    fun updateUrl(@RequestHeader("Authorization") auth: String, @PathVariable id:Long, @RequestBody data: Url): ResponseEntity<Void>{
-        return urlService.updateUrlCode(auth, id, data)
+    @GetMapping("/api/urls/{urlCode}/stats")
+    fun getUrlStats(@PathVariable urlCode: String): ResponseEntity<Url?> {
+        return ResponseEntity.ok<Url?>(urlService.getUrlStats(urlCode))
     }
 
-    @DeleteMapping("/api/urls/{id}")
+
+    @PutMapping("/api/urls/{urlCode}")
     @Transactional
-    fun deleteUrl(@RequestHeader("Authorization") auth: String, @PathVariable id: Long): ResponseEntity<Void> {
-        return urlService.deleteUrl(auth, id)
+    fun updateUrl(
+        @RequestHeader("Authorization") auth: String,
+        @PathVariable urlCode: String,
+        @RequestBody data: Url
+    ): ResponseEntity<Void> {
+        return urlService.updateUrlCode(auth, urlCode, data)
+    }
+
+    @DeleteMapping("/api/urls/{urlCode}")
+    @Transactional
+    fun deleteUrl(@RequestHeader("Authorization") auth: String, @PathVariable urlCode: String): ResponseEntity<Void> {
+        return urlService.deleteUrl(auth, urlCode)
     }
 
 }
