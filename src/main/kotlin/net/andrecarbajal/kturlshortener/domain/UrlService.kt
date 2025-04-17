@@ -32,7 +32,7 @@ class UrlService(private val urlRepository: UrlRepository) {
 
         val existingUrls: List<Url> = urlRepository.findByOriginalUrl(originalUrl)
         if (existingUrls.isNotEmpty()) {
-            return baseUrl + existingUrls.first().urlCode
+            return "${baseUrl}/${existingUrls.first().urlCode}"
         }
 
         var code = codeInput
@@ -43,7 +43,7 @@ class UrlService(private val urlRepository: UrlRepository) {
         val url = Url(originalUrl = originalUrl, urlCode = code)
         urlRepository.save(url)
 
-        return baseUrl + code
+        return "${baseUrl}/${code}"
     }
 
     fun getOriginalUrl(shortUrl: String): String? {
