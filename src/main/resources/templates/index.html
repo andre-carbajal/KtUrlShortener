@@ -1,41 +1,199 @@
-<!doctype html>
-<html lang="en">
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <script src="https://cdn.tailwindcss.com"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>URL Shortener</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        .toast {
+            position: fixed;
+            bottom: 1rem;
+            right: 1rem;
+            background-color: #333;
+            color: white;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out;
+            z-index: 50;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        i[data-lucide] {
+            display: inline-block;
+            width: 1em;
+            height: 1em;
+            vertical-align: -0.125em;
+        }
+    </style>
 </head>
-<body class="flex items-center justify-center min-h-screen bg-gray-100">
-<div class="text-center">
-    <h1 class="text-3xl font-bold mb-4">URL Shortener</h1>
-    <form action="/ui/urls" method="post" class="mb-4">
-        <label class="block mb-2">Create a short url:</label>
-        <input placeholder='Shorten your link' type="text" id="originalUrl" name="originalUrl" required
-               class="border p-2 mb-4 w-full">
-        <div class="flex mb-4">
-            <input placeholder="Code (optional)" type="text" id="urlCode" name="urlCode" class="border p-2 w-1/2 mr-2">
-            <input placeholder='Auth' type="password" id="authInput" name="authInput" class="border p-2 w-1/2">
+<body class="min-h-screen bg-gradient-to-b from-purple-50 to-white p-4 md:p-6 font-sans">
+
+<div class="max-w-7xl mx-auto">
+    <h1 class="text-3xl font-bold text-purple-800 text-center mb-8">URL Shortener</h1>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+        <div class="flex flex-col gap-6">
+            <div class="border border-purple-200 shadow-md rounded-lg bg-white">
+                <div class="bg-purple-600 text-white p-4 rounded-t-lg">
+                    <h2 class="text-xl font-semibold flex items-center gap-2">
+                        <i data-lucide="link" class="h-5 w-5"></i>
+                        Create Short URL
+                    </h2>
+                    <p class="text-sm text-purple-100 mt-1">
+                        Shorten your long URLs with just one click
+                    </p>
+                </div>
+                <div class="p-6">
+                    <form action="/ui/urls" method="post" class="space-y-4">
+                        <div class="space-y-2">
+                            <label for="originalUrl" class="block text-sm font-medium text-purple-800">
+                                Enter your URL
+                            </label>
+                            <input
+                                    id="originalUrl"
+                                    name="originalUrl"
+                                    type="url"
+                                    placeholder="https://example.com/very/long/url/that/needs/shortening"
+                                    class="w-full px-3 py-2 border border-purple-200 rounded-md shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500"
+                                    required
+                            />
+                        </div>
+                        <div class="space-y-2">
+                            <label for="urlCode" class="block text-sm font-medium text-purple-800">
+                                Custom Code (Optional)
+                            </label>
+                            <input
+                                    id="urlCode"
+                                    name="urlCode"
+                                    type="text"
+                                    placeholder="my-custom-code"
+                                    class="w-full px-3 py-2 border border-purple-200 rounded-md shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500"
+                            />
+                            <p class="text-xs text-purple-500">Leave empty for a random code</p>
+                        </div>
+                        <div class="space-y-2">
+                            <label for="authInput" class="block text-sm font-medium text-purple-800">
+                                Password Protection
+                            </label>
+                            <input
+                                    id="authInput"
+                                    name="authInput"
+                                    type="password"
+                                    placeholder="••••••••"
+                                    class="w-full px-3 py-2 border border-purple-200 rounded-md shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500"
+                            />
+                            <p class="text-xs text-purple-500">Set a password to protect your link</p>
+                        </div>
+                        <button
+                                type="submit"
+                                class="w-full inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
+                                id="submit-button"
+                        >
+                            Shorten URL
+                        </button>
+                    </form>
+                </div>
+                <div class="bg-purple-50 p-4 rounded-b-lg">
+                    <div class="w-full">
+                        <label for="short-url" class="block text-sm font-medium text-purple-800 mb-2">
+                            Your shortened URL
+                        </label>
+                        <div class="flex items-center gap-2">
+                            <input
+                                    id="short-url"
+                                    th:value="${shortUrl}" placeholder="Your shortened URL will appear here"
+                                    readonly
+                                    class="flex-grow px-3 py-2 border border-purple-200 rounded-md bg-white text-gray-700 focus:outline-none"
+                            />
+                            <button
+                                    onclick="copyToClipboard('short-url', 'copy-button-short')"
+                                    id="copy-button-short"
+                                    type="button"
+                                    class="inline-flex items-center justify-center p-2 border border-purple-200 rounded-md text-purple-600 hover:bg-purple-100 hover:text-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                                    th:disabled="${shortUrl == null or shortUrl == ''}"
+                            >
+                                <i data-lucide="copy" class="h-4 w-4"></i>
+                            </button>
+                        </div>
+                        <p th:if="${errorMessage}" th:text="${errorMessage}" class="text-sm text-red-600 mt-2"></p>
+                    </div>
+                </div>
+            </div>
         </div>
-        <button type="submit" class="bg-purple-700 hover:bg-purple-600 text-white p-2 rounded w-full">Shorten</button>
-        <div th:if="${errorMessage}" class="text-red-500 mt-2" th:text="${errorMessage}"></div>
-    </form>
-    <div>
-        <h2 class="text-2xl font-semibold mb-4">URLs</h2>
-        <ul>
-            <li th:each="url : ${urls}" class="px-4 py-2 cursor-pointer"
-                th:text="${baseUrl} + '/' + ${url.urlCode}"
-                onclick="redirectToUrl(this)"></li>
-        </ul>
+
+        <div class="flex flex-col">
+            <div class="border border-purple-200 shadow-md rounded-lg bg-white h-full flex flex-col">
+                <div class="bg-purple-500 text-white p-4 rounded-t-lg">
+                    <h2 class="text-xl font-semibold">Your URL History</h2>
+                    <p class="text-sm text-purple-100 mt-1">Previously shortened URLs</p>
+                </div>
+                <div class="flex-grow p-0 overflow-auto" style="max-height: calc(100vh - 250px);">
+                    <div th:if="${#lists.isEmpty(urlHistory)}"
+                         class="flex flex-col items-center justify-center py-12 px-4 text-center h-full">
+                        <div class="rounded-full bg-purple-100 p-3 mb-4">
+                            <i data-lucide="link" class="h-6 w-6 text-purple-600"></i>
+                        </div>
+                        <h3 class="text-lg font-medium text-purple-800 mb-2">No URLs shortened yet</h3>
+                        <p class="text-sm text-purple-500 max-w-xs">
+                            Your shortened URLs will appear here. Start by entering a URL in the form and clicking
+                            "Shorten URL".
+                        </p>
+                    </div>
+                    <div th:unless="${#lists.isEmpty(urlHistory)}" class="divide-y divide-purple-100">
+                        <div th:each="entry, iterStat : ${urlHistory}" class="p-4 hover:bg-purple-50">
+                            <div class="flex justify-between items-start mb-2">
+                                <div class="truncate max-w-[70%]">
+                                    <a
+                                            th:href="${entry.originalUrl}"
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            class="text-purple-800 hover:text-purple-600 font-medium flex items-center gap-1 text-sm"
+                                            th:title="${entry.originalUrl}"
+                                    >
+                                        <span th:text="${#strings.abbreviate(entry.originalUrl, 40)}"></span>
+                                        <i data-lucide="external-link" class="h-3 w-3 flex-shrink-0"></i>
+                                    </a>
+                                </div>
+                                <div class="flex items-center text-xs text-purple-400 gap-1 flex-shrink-0">
+                                    <i data-lucide="clock" class="h-3 w-3"></i>
+                                    <span th:text="${#dates.format(entry.createdAt, 'dd MMM yyyy HH:mm')}">Time</span>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-2 mt-1">
+                                <input th:value="${entry.shortUrl}" readonly
+                                       class="h-8 text-sm border-purple-200 bg-white rounded-md px-2 flex-grow focus:outline-none"/>
+                                <button
+                                        th:onclick="|copyToClipboardById('${entry.shortUrl}', 'copy-button-${entry.id}')|"
+                                        th:id="|copy-button-${entry.id}|"
+                                        type="button"
+                                        class="inline-flex items-center justify-center h-8 w-8 border border-purple-200 rounded-md text-purple-600 hover:bg-purple-100 hover:text-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
+                                >
+                                    <i data-lucide="copy" class="h-3 w-3"></i>
+                                </button>
+                            </div>
+                            <div th:if="${entry.hasPassword}" class="mt-1 text-xs text-purple-500">Password protected
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
+
+    <div class="mt-8 text-center text-purple-600 text-sm">Create short, memorable links in seconds</div>
 </div>
-<script>
-    function redirectToUrl(element) {
-        const url = element.textContent;
-        window.open(url, '_blank');
-    }
-</script>
+
+<div id="toast-notification" class="toast" role="alert">
+    <span id="toast-message"></span>
+</div>
+
 </body>
 </html>

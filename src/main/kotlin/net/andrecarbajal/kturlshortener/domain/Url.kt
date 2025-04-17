@@ -21,14 +21,11 @@ data class Url(
     var urlCode: String? = null,
 
     @JoinColumn(name = "created_at")
-    var createdAt: LocalDateTime? = null,
+    var createdAt: LocalDateTime = LocalDateTime.now(),
 
-    @JoinColumn(name = "updated_at")
-    var updatedAt: LocalDateTime? = null,
-
-    var visits: Long? = null
+    var visits: Long = 0
 ) {
     fun incrementVisits() {
-        this.visits = this.visits?.plus(1)
+        this.visits++
     }
 }

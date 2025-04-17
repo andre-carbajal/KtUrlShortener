@@ -84,7 +84,6 @@ class UrlService(private val urlRepository: UrlRepository) {
             ?: return ResponseEntity.notFound().build()
 
         url.originalUrl = data.originalUrl
-        url.updatedAt = LocalDateTime.now()
 
         urlRepository.save(url)
         return ResponseEntity.ok().build()
