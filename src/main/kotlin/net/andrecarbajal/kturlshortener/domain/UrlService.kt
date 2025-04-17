@@ -9,7 +9,6 @@ import java.net.URI
 import java.net.URISyntaxException
 import java.net.URL
 import java.security.SecureRandom
-import java.time.LocalDateTime
 import java.util.regex.Pattern
 
 @Service
@@ -108,9 +107,9 @@ class UrlService(private val urlRepository: UrlRepository) {
 
             val hostParts = host.split("\\.".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
             return hostParts.size < 2 || hostParts[0].isEmpty() || hostParts[hostParts.size - 1].isEmpty()
-        } catch (e: MalformedURLException) {
+        } catch (_: MalformedURLException) {
             return true
-        } catch (e: URISyntaxException) {
+        } catch (_: URISyntaxException) {
             return true
         }
     }

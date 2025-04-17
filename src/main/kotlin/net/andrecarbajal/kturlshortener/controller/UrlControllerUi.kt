@@ -3,7 +3,6 @@ package net.andrecarbajal.kturlshortener.controller
 import jakarta.servlet.http.HttpServletResponse
 import jakarta.transaction.Transactional
 import lombok.AllArgsConstructor
-import net.andrecarbajal.kturlshortener.domain.Url
 import net.andrecarbajal.kturlshortener.domain.UrlService
 import net.andrecarbajal.kturlshortener.infra.UrlException
 import org.springframework.stereotype.Controller
@@ -21,8 +20,12 @@ class UrlControllerUi(private val urlService: UrlService) {
 
     @GetMapping("/")
     fun getAllUrls(model: Model): String {
-        val urls: List<Url> = urlService.getAllUrls()
-        model.addAttribute("urls", urls)
+        val urls = urlService.getAllUrls().map { url ->
+            url.apply {
+                createdAtFormatted = createdAt.format(java.time.format.DateTimeFormatter.ofPattern("dd MMM yyyy HH:mm"))
+            }
+        }
+        model.addAttribute("urlHistory", urls)
         model.addAttribute("baseUrl", urlService.baseUrl)
         return "index"
     }

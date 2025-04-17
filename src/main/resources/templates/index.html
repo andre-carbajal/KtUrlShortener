@@ -130,59 +130,27 @@
         </div>
 
         <div class="flex flex-col">
-            <div class="border border-purple-200 shadow-md rounded-lg bg-white h-full flex flex-col">
-                <div class="bg-purple-500 text-white p-4 rounded-t-lg">
-                    <h2 class="text-xl font-semibold">Your URL History</h2>
-                    <p class="text-sm text-purple-100 mt-1">Previously shortened URLs</p>
+            <div class="border border-purple-200 shadow-md rounded-lg bg-white">
+                <div class="bg-purple-600 text-white p-4 rounded-t-lg">
+                    <h2 class="text-xl font-semibold flex items-center gap-2">
+                        <i data-lucide="history" class="h-5 w-5"></i>
+                        Your URL History
+                    </h2>
+                    <p class="text-sm text-purple-100 mt-1">
+                        View all your previously shortened URLs
+                    </p>
                 </div>
-                <div class="flex-grow p-0 overflow-auto" style="max-height: calc(100vh - 250px);">
-                    <div th:if="${#lists.isEmpty(urlHistory)}"
-                         class="flex flex-col items-center justify-center py-12 px-4 text-center h-full">
-                        <div class="rounded-full bg-purple-100 p-3 mb-4">
-                            <i data-lucide="link" class="h-6 w-6 text-purple-600"></i>
-                        </div>
-                        <h3 class="text-lg font-medium text-purple-800 mb-2">No URLs shortened yet</h3>
-                        <p class="text-sm text-purple-500 max-w-xs">
-                            Your shortened URLs will appear here. Start by entering a URL in the form and clicking
-                            "Shorten URL".
-                        </p>
-                    </div>
-                    <div th:unless="${#lists.isEmpty(urlHistory)}" class="divide-y divide-purple-100">
-                        <div th:each="entry, iterStat : ${urlHistory}" class="p-4 hover:bg-purple-50">
-                            <div class="flex justify-between items-start mb-2">
-                                <div class="truncate max-w-[70%]">
-                                    <a
-                                            th:href="${entry.originalUrl}"
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            class="text-purple-800 hover:text-purple-600 font-medium flex items-center gap-1 text-sm"
-                                            th:title="${entry.originalUrl}"
-                                    >
-                                        <span th:text="${#strings.abbreviate(entry.originalUrl, 40)}"></span>
-                                        <i data-lucide="external-link" class="h-3 w-3 flex-shrink-0"></i>
-                                    </a>
-                                </div>
-                                <div class="flex items-center text-xs text-purple-400 gap-1 flex-shrink-0">
-                                    <i data-lucide="clock" class="h-3 w-3"></i>
-                                    <span th:text="${#dates.format(entry.createdAt, 'dd MMM yyyy HH:mm')}">Time</span>
-                                </div>
+                <div class="p-6">
+                    <ul class="space-y-4">
+                        <li th:each="entry : ${urlHistory}" class="flex items-center justify-between">
+                            <div>
+                                <a th:href="${baseUrl + '/' + entry.urlCode}" th:text="${baseUrl + '/' + entry.urlCode}"
+                                   class="text-purple-600 hover:underline"></a>
+                                <p th:text="${entry.originalUrl}" class="text-sm text-gray-600"></p>
                             </div>
-                            <div class="flex items-center gap-2 mt-1">
-                                <input th:value="${entry.shortUrl}" readonly
-                                       class="h-8 text-sm border-purple-200 bg-white rounded-md px-2 flex-grow focus:outline-none"/>
-                                <button
-                                        th:onclick="|copyToClipboardById('${entry.shortUrl}', 'copy-button-${entry.id}')|"
-                                        th:id="|copy-button-${entry.id}|"
-                                        type="button"
-                                        class="inline-flex items-center justify-center h-8 w-8 border border-purple-200 rounded-md text-purple-600 hover:bg-purple-100 hover:text-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
-                                >
-                                    <i data-lucide="copy" class="h-3 w-3"></i>
-                                </button>
-                            </div>
-                            <div th:if="${entry.hasPassword}" class="mt-1 text-xs text-purple-500">Password protected
-                            </div>
-                        </div>
-                    </div>
+                            <span th:text="${entry.createdAtFormatted}" class="text-sm text-gray-500"></span>
+                        </li>
+                    </ul>
                 </div>
             </div>
         </div>

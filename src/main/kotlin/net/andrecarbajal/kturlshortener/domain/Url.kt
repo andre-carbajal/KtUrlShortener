@@ -23,6 +23,9 @@ data class Url(
     @JoinColumn(name = "created_at")
     var createdAt: LocalDateTime = LocalDateTime.now(),
 
+    @Transient
+    var createdAtFormatted: String? = null,
+
     var visits: Long = 0
 ) {
     fun incrementVisits() {
