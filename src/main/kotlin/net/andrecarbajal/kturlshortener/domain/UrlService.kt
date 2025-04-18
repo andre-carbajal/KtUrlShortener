@@ -12,7 +12,7 @@ import java.security.SecureRandom
 import java.util.regex.Pattern
 
 @Service
-class UrlService(private val urlRepository: UrlRepository) {
+class UrlService(private val urlRepository: UrlRedisRepository) {
 
     @Value("\${app.base-url}")
     lateinit var baseUrl: String
@@ -49,8 +49,7 @@ class UrlService(private val urlRepository: UrlRepository) {
         val url: Url = urlRepository.findByUrlCode(shortUrl)
             ?: return null
 
-        url.incrementVisits()
-        urlRepository.save(url)
+        urlRepository.incrementVisits(shortUrl)
         return url.originalUrl
     }
 
@@ -59,7 +58,7 @@ class UrlService(private val urlRepository: UrlRepository) {
     }
 
     fun getAllUrls(): List<Url> {
-        return urlRepository.findAll().reversed()
+        return urlRepository.findAll()
     }
 
     fun deleteUrl(authInput: String, urlCode: String): ResponseEntity<Void> {
@@ -67,10 +66,7 @@ class UrlService(private val urlRepository: UrlRepository) {
             throw UrlException.AuthException("Invalid auth code")
         }
 
-        val url: Url = urlRepository.findByUrlCode(urlCode)
-            ?: return ResponseEntity.notFound().build()
-
-        urlRepository.delete(url)
+        urlRepository.delete(urlCode)
         return ResponseEntity.noContent().build()
     }
 
@@ -79,12 +75,10 @@ class UrlService(private val urlRepository: UrlRepository) {
             throw UrlException.AuthException("Invalid auth code")
         }
 
-        val url: Url = urlRepository.findByUrlCode(urlCode)
-            ?: return ResponseEntity.notFound().build()
+        data.originalUrl?.let {
+            urlRepository.update(urlCode, it)
+        }
 
-        url.originalUrl = data.originalUrl
-
-        urlRepository.save(url)
         return ResponseEntity.ok().build()
     }
 

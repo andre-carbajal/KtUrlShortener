@@ -1,1 +1,0 @@
-ALTER TABLE url drop column updated_at;

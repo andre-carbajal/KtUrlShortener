@@ -1,10 +1,10 @@
 package net.andrecarbajal.kturlshortener.controller
 
-import jakarta.transaction.Transactional
 import net.andrecarbajal.kturlshortener.domain.Url
 import net.andrecarbajal.kturlshortener.domain.UrlService
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Controller
+import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.bind.annotation.*
 
 

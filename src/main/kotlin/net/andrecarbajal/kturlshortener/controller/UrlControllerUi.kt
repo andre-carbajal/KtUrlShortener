@@ -1,11 +1,11 @@
 package net.andrecarbajal.kturlshortener.controller
 
 import jakarta.servlet.http.HttpServletResponse
-import jakarta.transaction.Transactional
 import lombok.AllArgsConstructor
 import net.andrecarbajal.kturlshortener.domain.UrlService
 import net.andrecarbajal.kturlshortener.infra.UrlException
 import org.springframework.stereotype.Controller
+import org.springframework.transaction.annotation.Transactional
 import org.springframework.ui.Model
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
